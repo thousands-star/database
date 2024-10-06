@@ -96,7 +96,7 @@ def register():
     username = data.get('username')
     password = data.get('password')
     auth_method = data.get('auth_method')
-    telephone_number = data.get('telephone_number')
+    telephone_number = data.get('telephone')
 
     print([username, password, auth_method, telephone_number])
 

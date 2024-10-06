@@ -145,4 +145,4 @@ if __name__ == '__main__':
         with open('users.json', 'w') as file:
             json.dump({}, file)
 
-    app.run(debug=True)
+    app.run(host='0.0.0.0', port=5000, debug=True)

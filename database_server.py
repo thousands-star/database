@@ -124,6 +124,27 @@ def login():
     else:
         return jsonify({"error": "Invalid username or password"}), 401
 
+@app.route('/get_chat_id', methods=['POST'])
+def get_chat_id():
+    data = request.json
+    username = data.get('username')
+    password = data.get('password')
+
+    if not username or not password:
+        return jsonify({"error": "Username and password are required"}), 400
+
+    # Check if the username and password are correct
+    if UserAuthenticator.check(username, password):
+        # Get user data
+        user_data = UserDatabase.get_user(username)
+
+        # Return chat_id if available, otherwise return telephone_number
+        if user_data['chat_id']:
+            return jsonify({"message": "Login successful", "chat_id": user_data['chat_id']}), 200
+        else:
+            return jsonify({"message": "Login successful", "telephone_number": user_data['telephone_number']}), 200
+    else:
+        return jsonify({"error": "Invalid username or password"}), 401
 
 @app.route('/add_chat_id', methods=['POST'])
 def add_chat_id():

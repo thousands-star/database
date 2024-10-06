@@ -105,7 +105,7 @@ def register():
     if success:
         return jsonify({"message": message}), 201
     else:
-        return jsonify({"error": message}), 400
+        return jsonify({"error": message}), 401
 
 
 @app.route('/login', methods=['POST'])

@@ -98,6 +98,8 @@ def register():
     auth_method = data.get('auth_method')
     telephone_number = data.get('telephone_number')
 
+    print([username, password, auth_method, telephone_number])
+
     if not all([username, password, auth_method, telephone_number]):
         return jsonify({"error": "All fields (username, password, auth_method, telephone_number) are required"}), 400
 

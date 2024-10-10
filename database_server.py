@@ -171,7 +171,9 @@ def get_fullness_txt():
     
 @app.route('/get_analysis', methods=['GET'])
 def get_analysis():
-    file_path = './analysis.txt'  # Ensure this is the correct path to your file
+    file_path = os.path.join(os.getcwd(), 'analysis.txt')
+    print(file_path)
+    # file_path = './analysis.txt'  # Ensure this is the correct path to your file
     try:
         return send_file(file_path, as_attachment=True)
     except FileNotFoundError:

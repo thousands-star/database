@@ -76,7 +76,6 @@ class UserDatabase:
 
 # Authenticator class to handle authentication logic
 class UserAuthenticator:
-
     @classmethod
     def check(cls, username, password):
         """

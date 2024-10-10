@@ -187,6 +187,9 @@ def get_fullness_image():
     except FileNotFoundError:
         return jsonify({"error": "File not found"}), 404
 
+@app.route('/test', methods=['GET'])
+def test_route():
+    return "Server is running!"
 
 if __name__ == '__main__':
     # Initialize an empty JSON file if it doesn't exist

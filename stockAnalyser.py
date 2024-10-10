@@ -228,7 +228,8 @@ class StockAnalyser:
             data.append(f"Storage Tank {self.storagetank_list[i].get_tag()}: {self.storagetank_fullness[i]:.2f}%")
         max_index = self.storagetank_fullness.index(max(self.storagetank_fullness))
         min_index = self.storagetank_fullness.index(min(self.storagetank_fullness))
-        data.append(f"Note: Highest stock level in Storage Tank {self.storagetank_list[max_index].get_tag()} - {max(self.storagetank_fullness):.2f}%. Check for potential expiration.")
+        data.append(f"Note:")
+        data.append(f"Highest stock level in Storage Tank {self.storagetank_list[max_index].get_tag()} - {max(self.storagetank_fullness):.2f}%. Check for potential expiration.")
         data.append(f"Stock replenishment needed for Storage Tank {self.storagetank_list[min_index].get_tag()} - {min(self.storagetank_fullness):.2f}% remaining.")
 
         # write the data to the txt file

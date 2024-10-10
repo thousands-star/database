@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, send_file
 import json
 import os
 
@@ -159,6 +159,33 @@ def add_chat_id():
         return jsonify({"message": message}), 200
     else:
         return jsonify({"error": message}), 404
+
+@app.route('/get_fullness_txt', methods=['GET'])
+def get_fullness_txt():
+    file_path = 'fullness.txt'  # Ensure this is the correct path to your file
+    try:
+        return send_file(file_path, as_attachment=True)
+    except FileNotFoundError:
+        return jsonify({"error": "File not found"}), 404
+    
+    
+@app.route('/get_analysis', methods=['GET'])
+def get_analysis():
+    file_path = 'analysis.txt'  # Ensure this is the correct path to your file
+    try:
+        return send_file(file_path, as_attachment=True)
+    except FileNotFoundError:
+        return jsonify({"error": "File not found"}), 404
+
+
+# Route to get the PNG image (storagetank_fullness.png)
+@app.route('/get_fullness_image', methods=['GET'])
+def get_fullness_image():
+    file_path = 'storagetank_fullness.png'  # Ensure this is the correct path to your PNG file
+    try:
+        return send_file(file_path, mimetype='image/png', as_attachment=True)
+    except FileNotFoundError:
+        return jsonify({"error": "File not found"}), 404
 
 
 if __name__ == '__main__':

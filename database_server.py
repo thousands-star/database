@@ -112,9 +112,9 @@ def get_public_key():
     return jsonify({"public_key": public_key.save_pkcs1().decode()})
 
 
-def decrypt_json(json):
+def decrypt_json(data):
     global private_key
-    encrypted_message = json.get('encrypted_message')
+    encrypted_message = data.get('encrypted_message')
     # Decrypt the encrypted message using the private key
     encrypted_message_bytes = base64.b64decode(encrypted_message)
     decrypted_message = rsa.decrypt(encrypted_message_bytes, private_key)

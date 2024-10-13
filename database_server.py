@@ -119,7 +119,9 @@ def decrypt_json(data):
     print("The encrypted data: " + encrypted_message)
     # Decrypt the encrypted message using the private key
     encrypted_message_bytes = base64.b64decode(encrypted_message)
-    print("\n decoded with private key " + private_key + "\n") 
+    print("\n decoded with private key") 
+    print(private_key)
+    print("\n")
     decrypted_message = rsa.decrypt(encrypted_message_bytes, private_key)
     # Decode the byte message to string and then parse JSON
     json_data = json.loads(decrypted_message.decode())

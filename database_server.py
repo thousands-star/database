@@ -113,13 +113,19 @@ def get_public_key():
 
 
 def decrypt_json(data):
+    print("----------Decrypting Incoming Message----------")
     global private_key
     encrypted_message = data.get('encrypted_message')
+    print("The encrypted data: " + encrypted_message)
     # Decrypt the encrypted message using the private key
     encrypted_message_bytes = base64.b64decode(encrypted_message)
+    print("\n decoded with private key " + private_key + "\n") 
     decrypted_message = rsa.decrypt(encrypted_message_bytes, private_key)
     # Decode the byte message to string and then parse JSON
     json_data = json.loads(decrypted_message.decode())
+    print("\ndecrypted data:")
+    print(json_data)
+    print("---------------Decryption Done---------------")
     return json_data
 
 @app.route('/register', methods=['POST'])

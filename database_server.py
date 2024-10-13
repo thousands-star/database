@@ -1,6 +1,9 @@
 from flask import Flask, request, jsonify, send_file
 import json
 import os
+import time
+import rsa
+import base64
 
 app = Flask(__name__)
 
@@ -87,11 +90,41 @@ class UserAuthenticator:
         return False
 
 
-# Flask routes
+private_key = None
+public_key = None
+
+def generate_new_key():
+    global private_key, public_key
+    # Flask routes
+    # Generate RSA key pair (this could be stored securely)
+    # Generate RSA key pair (this could be stored securely)
+    (public_key, private_key) = rsa.newkeys(2048)
+    print(f"Public key generated: {public_key}")
+    print(f"Private key generated: {private_key}")
+
+generate_new_key()
+TIMETOCHANGEKEY = 600
+TIMEENCRYPT = time.time()
+
+@app.route('/get_public_key', methods=['GET'])
+def get_public_key():
+    # Return the public key to the client in PEM format
+    return jsonify({"public_key": public_key.save_pkcs1().decode()})
+
+
+def decrypt_json(json):
+    global private_key
+    encrypted_message = json.get('encrypted_message')
+    # Decrypt the encrypted message using the private key
+    encrypted_message_bytes = base64.b64decode(encrypted_message)
+    decrypted_message = rsa.decrypt(encrypted_message_bytes, private_key)
+    # Decode the byte message to string and then parse JSON
+    json_data = json.loads(decrypted_message.decode())
+    return json_data
 
 @app.route('/register', methods=['POST'])
 def register():
-    data = request.json
+    data = decrypt_json(request.json)
     username = data.get('username')
     password = data.get('password')
     auth_method = data.get('auth_method')
@@ -111,7 +144,7 @@ def register():
 
 @app.route('/login', methods=['POST'])
 def login():
-    data = request.json
+    data = decrypt_json(request.json)
     username = data.get('username')
     password = data.get('password')
 
@@ -125,7 +158,7 @@ def login():
 
 @app.route('/get_chat_id', methods=['POST'])
 def get_chat_id():
-    data = request.json
+    data = decrypt_json(request.json)
     username = data.get('username')
     password = data.get('password')
 
@@ -147,7 +180,7 @@ def get_chat_id():
 
 @app.route('/add_chat_id', methods=['POST'])
 def add_chat_id():
-    data = request.json
+    data = decrypt_json(request.json)
     username = data.get('username')
     chat_id = data.get('chat_id')
 

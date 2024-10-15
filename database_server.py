@@ -112,10 +112,11 @@ def get_public_key():
     return jsonify({"public_key": public_key.save_pkcs1().decode()})
 
 
-def decrypt_json(data):
+def decrypt_json(data: dict):
     print("----------Decrypting Incoming Message----------")
     global private_key
     encrypted_message = data.get('encrypted_message')
+    print(f"Encryted message: {encrypted_message}")
     print("The encrypted data: " + encrypted_message)
     # Decrypt the encrypted message using the private key
     encrypted_message_bytes = base64.b64decode(encrypted_message)

@@ -234,6 +234,49 @@ def get_fullness_image():
 def test_route():
     return "Server is running!"
 
+@app.route('/who_is_in', methods=['POST', 'GET'])
+def who_is_in():
+    """
+    This route will accept a list of users currently in the factory, decrypt it,
+    and store the information in a JSON file.
+    """
+    occupants_file = 'occupants.json'
+
+    if request.method == 'POST':
+        data = decrypt_json(request.json)  # Decrypt incoming encrypted data
+        occupants = data.get('occupants')
+        
+        if not occupants:
+            return jsonify({"error": "No occupants data provided"}), 400
+
+        # Load the current occupants list (if it exists) or initialize an empty one
+        if os.path.exists(occupants_file):
+            with open(occupants_file, 'r') as file:
+                current_occupants = json.load(file)
+        else:
+            current_occupants = []
+
+        # Append new occupants to the existing list
+        for occupant in occupants:
+            if occupant not in current_occupants:
+                current_occupants.append(occupant)
+
+        # Save the updated occupants list to a JSON file
+        with open(occupants_file, 'w') as file:
+            json.dump(current_occupants, file, indent=4)
+
+        return jsonify({"message": "Occupants list updated successfully", "occupants": current_occupants}), 200
+    
+    elif request.method == 'GET':
+        # Load the current occupants list (if it exists) or initialize an empty one
+        if os.path.exists(occupants_file):
+            with open(occupants_file, 'r') as file:
+                current_occupants = json.load(file)
+        else:
+            current_occupants = []
+
+        return jsonify({"occupants": current_occupants}), 200
+
 if __name__ == '__main__':
     # Initialize an empty JSON file if it doesn't exist
     if not os.path.exists('users.json'):

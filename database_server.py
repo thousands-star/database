@@ -112,24 +112,31 @@ def get_public_key():
     return jsonify({"public_key": public_key.save_pkcs1().decode()})
 
 
-def decrypt_json(data: dict):
+def decrypt_json(data):
     print("----------Decrypting Incoming Message----------")
     global private_key
-    encrypted_message = data.get('encrypted_message')
-    print(f"Encryted message: {encrypted_message}")
-    print("The encrypted data: " + encrypted_message)
-    # Decrypt the encrypted message using the private key
-    encrypted_message_bytes = base64.b64decode(encrypted_message)
-    print("\n decoded with private key") 
-    print(private_key)
-    print("\n")
-    decrypted_message = rsa.decrypt(encrypted_message_bytes, private_key)
-    # Decode the byte message to string and then parse JSON
-    json_data = json.loads(decrypted_message.decode())
-    print("\ndecrypted data:")
-    print(json_data)
-    print("---------------Decryption Done---------------")
-    return json_data
+    try:
+        encrypted_message = data.get('encrypted_message')
+        if not encrypted_message:
+            raise ValueError("No encrypted_message found in the request")
+
+        print("The encrypted data: " + encrypted_message)
+        # Decrypt the encrypted message using the private key
+        encrypted_message_bytes = base64.b64decode(encrypted_message)
+        print("\n decoded with private key")
+        print(private_key)
+        print("\n")
+        decrypted_message = rsa.decrypt(encrypted_message_bytes, private_key)
+        # Decode the byte message to string and then parse JSON
+        json_data = json.loads(decrypted_message.decode())
+        print("\ndecrypted data:")
+        print(json_data)
+        print("---------------Decryption Done---------------")
+        return json_data
+    except Exception as e:
+        print(f"Error during decryption: {e}")
+        raise
+
 
 @app.route('/register', methods=['POST'])
 def register():
@@ -153,39 +160,47 @@ def register():
 
 @app.route('/login', methods=['POST'])
 def login():
-    data = decrypt_json(request.json)
-    username = data.get('username')
-    password = data.get('password')
+    try:
+        data = decrypt_json(request.json)
+        username = data.get('username')
+        password = data.get('password')
+        print(f"Login attempt: Username={username}, Password={password}")
 
-    if not username or not password:
-        return jsonify({"error": "Username and password are required"}), 400
+        if not username or not password:
+            return jsonify({"error": "Username and password are required"}), 400
 
-    if UserAuthenticator.check(username, password):
-        return jsonify({"message": "Login successful"}), 200
-    else:
-        return jsonify({"error": "Invalid username or password"}), 401
+        if UserAuthenticator.check(username, password):
+            return jsonify({"message": "Login successful"}), 200
+        else:
+            return jsonify({"error": "Invalid username or password"}), 401
+    except Exception as e:
+        print(f"Login error: {e}")
+        return jsonify({"error": "Decryption failed or internal server error"}), 500
+
 
 @app.route('/get_chat_id', methods=['POST'])
 def get_chat_id():
-    data = decrypt_json(request.json)
-    username = data.get('username')
-    password = data.get('password')
+    try:
+        data = decrypt_json(request.json)
+        username = data.get('username')
+        password = data.get('password')
+        print(f"Get Chat ID attempt: Username={username}, Password={password}")
 
-    if not username or not password:
-        return jsonify({"error": "Username and password are required"}), 400
+        if not username or not password:
+            return jsonify({"error": "Username and password are required"}), 400
 
-    # Check if the username and password are correct
-    if UserAuthenticator.check(username, password):
-        # Get user data
-        user_data = UserDatabase.get_user(username)
-
-        # Return chat_id if available, otherwise return telephone_number
-        if user_data['chat_id']:
-            return jsonify({"message": "Login successful", "chat_id": user_data['chat_id']}), 200
+        if UserAuthenticator.check(username, password):
+            user_data = UserDatabase.get_user(username)
+            if user_data['chat_id']:
+                return jsonify({"message": "Login successful", "chat_id": user_data['chat_id']}), 200
+            else:
+                return jsonify({"message": "Login successful", "telephone_number": user_data['telephone_number']}), 200
         else:
-            return jsonify({"message": "Login successful", "telephone_number": user_data['telephone_number']}), 200
-    else:
-        return jsonify({"error": "Invalid username or password"}), 401
+            return jsonify({"error": "Invalid username or password"}), 401
+    except Exception as e:
+        print(f"Error fetching chat ID: {e}")
+        return jsonify({"error": "Decryption failed or internal server error"}), 500
+
 
 @app.route('/add_chat_id', methods=['POST'])
 def add_chat_id():
@@ -277,6 +292,16 @@ def who_is_in():
             current_occupants = []
 
         return jsonify({"occupants": current_occupants}), 200
+
+@app.route('/get_all_chat_ids', methods=['GET'])
+def get_all_chat_ids():
+    """
+    Return all chat IDs of registered users.
+    """
+    users = UserDatabase.load_users()
+    chat_ids = {user['chat_id'] for user in users.values() if user['chat_id']}
+    
+    return jsonify({'chat_ids': list(chat_ids)}), 200
 
 if __name__ == '__main__':
     # Initialize an empty JSON file if it doesn't exist

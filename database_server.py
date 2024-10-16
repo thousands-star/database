@@ -250,19 +250,17 @@ def get_fullness_image():
 def test_route():
     return "Server is running!"
 
+
+
 @app.route('/who_is_in', methods=['POST', 'GET'])
 def who_is_in():
-    """
-    This route will accept a list of users currently in the factory, decrypt it,
-    and store the information in a JSON file.
-    """
     occupants_file = 'occupants.json'
 
     if request.method == 'POST':
         data = decrypt_json(request.json)  # Decrypt incoming encrypted data
-        occupants = data.get('occupants')
-        
-        if not occupants:
+        occupants = data.get('occupants')  # Extract "occupants" field
+
+        if not occupants:  # If "occupants" field is empty or missing
             return jsonify({"error": "No occupants data provided"}), 400
 
         # Load the current occupants list (if it exists) or initialize an empty one

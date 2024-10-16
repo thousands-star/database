@@ -260,8 +260,9 @@ def who_is_in():
         data = decrypt_json(request.json)  # Decrypt incoming encrypted data
         occupants = data.get('occupants')  # Extract "occupants" field
 
-        if not occupants:  # If "occupants" field is empty or missing
-            return jsonify({"error": "No occupants data provided"}), 400
+        # Check if occupants is empty or missing
+        if not occupants:
+            occupants = ["No one is in the factory"]
 
         # Load the current occupants list (if it exists) or initialize an empty one
         if os.path.exists(occupants_file):
@@ -270,7 +271,7 @@ def who_is_in():
         else:
             current_occupants = []
 
-        # Append new occupants to the existing list
+        # Append new occupants to the existing list, avoiding duplicates
         for occupant in occupants:
             if occupant not in current_occupants:
                 current_occupants.append(occupant)
@@ -289,7 +290,12 @@ def who_is_in():
         else:
             current_occupants = []
 
+        # If the current occupants list is empty, update the message
+        if not current_occupants:
+            current_occupants = ["No one is in the factory"]
+
         return jsonify({"occupants": current_occupants}), 200
+
 
 @app.route('/get_all_chat_ids', methods=['GET'])
 def get_all_chat_ids():

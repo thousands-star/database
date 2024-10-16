@@ -250,10 +250,7 @@ class StockAnalyser:
         Plots the fullness of each tank in a bar chart.
 
         This function generates a bar chart to visualize the current fullness of each storage tank.
-        The bar colors are determined based on the following criteria:
-        - If the fullness is above 75%, the bar color is set to 'green'.
-        - If the fullness is in the range of 30 - 75 %, the bar color is set to 'orange'.
-        - Otherwise (below 30 %), the bar color is set to 'red'.
+        The bar colors are set based on the tank types (Grains, Sugar, Flour, Legumes).
 
         Args:
             None
@@ -262,17 +259,8 @@ class StockAnalyser:
             None
         """
         tank_tags = [f"{self.storagetank_list[i].get_tag()}" for i in range(self.storagetank_num)]
-        
-        # Set the bar colors accordingly
-        bar_colors = []
-        for fullness in self.storagetank_fullness:
-            if fullness > 75:
-                bar_colors.append('green')
-            elif fullness > 30:
-                bar_colors.append('orange')
-            else:
-                bar_colors.append('red')
-        
+        # Set specific bar colors for each tank
+        bar_colors = ['blue', 'red', 'green', 'purple']  # Order corresponds to Grains, Sugar, Flour, Legumes
         plt.clf()                                       # Clear the current figure to update with new data
         plt.bar(tank_tags, self.storagetank_fullness, color=bar_colors)
         plt.xlabel('Storage Tank')
@@ -281,13 +269,9 @@ class StockAnalyser:
         plt.ylim(0, 100)                                # Set the y-axis limit to 100%
         # Add grid for better visibility
         plt.grid(True, which='both', linestyle='--', linewidth=0.5)
-        # Create custom legend handles
-        green_patch = mpatches.Patch(color='green', label='Above 75% (High Capacity)')
-        orange_patch = mpatches.Patch(color='orange', label='30% - 75% (Moderate Capacity)')
-        red_patch = mpatches.Patch(color='red', label='0% - 30% (Low Capacity)')
-        # Add the legend to the plot
-        plt.legend(handles=[green_patch, orange_patch, red_patch], title="Fullness Levels")
-        plt.savefig("storagetank_fullness.png")             # Save the plot to a png file    
+        # Save the figure without the legend
+        plt.savefig("storagetank_fullness.png")
+        # Save the plot to a png file    
     
 
 if __name__ == "__main__":

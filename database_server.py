@@ -276,10 +276,6 @@ def who_is_in():
             if occupant not in current_occupants:
                 current_occupants.append(occupant)
 
-        # Remove "No one is in the factory" if there are now occupants
-        if "No one is in the factory" in current_occupants:
-            current_occupants.remove("No one is in the factory")
-
         # Save the updated occupants list to a JSON file
         with open(occupants_file, 'w') as file:
             json.dump(current_occupants, file, indent=4)
@@ -294,11 +290,9 @@ def who_is_in():
         else:
             current_occupants = []
 
-        # If the current occupants list is empty, return the "No one is in the factory" message
-        if not current_occupants:
-            return jsonify({"occupants": "No one is in the factory"}), 200
-
+        # Simply return the list of occupants (empty list if no occupants)
         return jsonify({"occupants": current_occupants}), 200
+
 
 
 @app.route('/get_all_chat_ids', methods=['GET'])

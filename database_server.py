@@ -260,12 +260,12 @@ def who_is_in():
         data = decrypt_json(request.json)  # Decrypt incoming encrypted data
         occupants = data.get('occupants')  # Extract "occupants" field
 
+        
         # Check if occupants is empty or missing
         if not occupants:
-            occupants = ["No one is in the factory"]
-
+            pass
         # Load the current occupants list (if it exists) or initialize an empty one
-        if os.path.exists(occupants_file):
+        elif os.path.exists(occupants_file):
             with open(occupants_file, 'r') as file:
                 current_occupants = json.load(file)
         else:

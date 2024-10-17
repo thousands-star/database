@@ -260,12 +260,12 @@ def who_is_in():
         data = decrypt_json(request.json)  # Decrypt incoming encrypted data
         occupants = data.get('occupants')  # Extract "occupants" field
 
-        
-        # Check if occupants is empty or missing
+        # If occupants is empty or missing, do nothing
         if not occupants:
-            pass
+            return jsonify({"message": "No occupants to update"}), 200
+
         # Load the current occupants list (if it exists) or initialize an empty one
-        elif os.path.exists(occupants_file):
+        if os.path.exists(occupants_file):
             with open(occupants_file, 'r') as file:
                 current_occupants = json.load(file)
         else:
@@ -276,12 +276,16 @@ def who_is_in():
             if occupant not in current_occupants:
                 current_occupants.append(occupant)
 
+        # Remove "No one is in the factory" if there are now occupants
+        if "No one is in the factory" in current_occupants:
+            current_occupants.remove("No one is in the factory")
+
         # Save the updated occupants list to a JSON file
         with open(occupants_file, 'w') as file:
             json.dump(current_occupants, file, indent=4)
 
         return jsonify({"message": "Occupants list updated successfully", "occupants": current_occupants}), 200
-    
+
     elif request.method == 'GET':
         # Load the current occupants list (if it exists) or initialize an empty one
         if os.path.exists(occupants_file):
@@ -290,9 +294,9 @@ def who_is_in():
         else:
             current_occupants = []
 
-        # If the current occupants list is empty, update the message
+        # If the current occupants list is empty, return the "No one is in the factory" message
         if not current_occupants:
-            current_occupants = ["No one is in the factory"]
+            return jsonify({"occupants": "No one is in the factory"}), 200
 
         return jsonify({"occupants": current_occupants}), 200
 
